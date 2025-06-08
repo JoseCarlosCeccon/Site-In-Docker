@@ -1,6 +1,6 @@
 services:
     database:
-        image: mongodb
+        image: mongo
         container_name: mongodb
         ports:
             - "27017:27017"
@@ -9,16 +9,27 @@ services:
         networks:
             - app_network
     backend:
-        image: #upload no dockerhub
+        image: gabrielcouzzi/aspnetcervejaria:latest
         container_name: backend
         ports:
-            - "5229:5229"
+            - "5229:8080"
         networks:
             - app_network
         environment:
-            MONGODB_URL: mongodb://database:27017 
+            CervejariaDatabase__ConnectionString: mongodb://database:27017 
+            Redis__Configuration: "redis:6379"
         depends_on:
             - database
+            - redis
+    redis:
+        image: redis
+        container_name: redis
+        ports:
+            - "6379:6379"
+        networks:
+            - app_network
+        volumes:
+            - redis_data:/data
     frontend:
         image: #upload no dockerhub
         container_name: frontend
@@ -28,6 +39,7 @@ services:
             - backend
 volumes:
     mongodb_data:
+    redis_data:
 
 networks:
     app_network:
