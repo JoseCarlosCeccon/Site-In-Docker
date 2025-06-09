@@ -1,46 +1,52 @@
 services:
-    database:
-        image: mongo
-        container_name: mongodb
-        ports:
-            - "27017:27017"
-        volumes:
-            - mongodb_data:/data/db
-        networks:
-            - app_network
-    backend:
-        image: gabrielcouzzi/aspnetcervejaria:latest
-        container_name: backend
-        ports:
-            - "5229:8080"
-        networks:
-            - app_network
-        environment:
-            CervejariaDatabase__ConnectionString: mongodb://database:27017 
-            Redis__Configuration: "redis:6379"
-        depends_on:
-            - database
-            - redis
-    redis:
-        image: redis
-        container_name: redis
-        ports:
-            - "6379:6379"
-        networks:
-            - app_network
-        volumes:
-            - redis_data:/data
-    frontend:
-        image: #upload no dockerhub
-        container_name: frontend
-        ports: 
-        networks: 
-        depends_on:
-            - backend
+  database:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app_network
+
+  backend:
+    image: gabrielcouzzi/aspnetcervejaria:latest
+    container_name: backend
+    ports:
+      - "5229:8080"
+    networks:
+      - app_network
+    environment:
+      - CervejariaDatabase__ConnectionString=mongodb://database:27017
+      - Redis__Configuration=redis:6379
+    depends_on:
+      - database
+      - redis
+
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - app_network
+    volumes:
+      - redis_data:/data
+
+  frontend:
+    image: gabrielcouzzi/frontendcervejaria:latest
+    container_name: frontend
+    ports: 
+      - "8080:80"
+    networks: 
+      - app_network
+    depends_on:
+      - backend
+
 volumes:
-    mongodb_data:
-    redis_data:
+  mongodb_data:
+  redis_data:
 
 networks:
-    app_network:
-        driver: bridge
+  app_network:
+    driver: bridge
